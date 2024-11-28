@@ -6,18 +6,17 @@ import requests
 import re
 import time
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
 
 
 
 
-INDIANKANOON_API_TOKEN = os.getenv('INDIANKANOON_API_TOKEN')
-HUGGINGFACE_API_TOKEN = os.getenv('HUGGINGFACE_API_TOKEN')
-API_URL = os.getenv('API_URL')
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-OPENAI_ENDPOINT = os.getenv('OPENAI_ENDPOINT')
+import streamlit as st
+
+INDIANKANOON_API_TOKEN = st.secrets["INDIANKANOON_API_TOKEN"]
+HUGGINGFACE_API_TOKEN = st.secrets["HUGGINGFACE_API_TOKEN"]
+API_URL = st.secrets["API_URL"]
+OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
+OPENAI_ENDPOINT = st.secrets["OPENAI_ENDPOINT"]
 
 
 OPENAI_HEADERS = {
