@@ -12,11 +12,11 @@ import os
 
 import streamlit as st
 
-INDIANKANOON_API_TOKEN = st.secrets["INDIANKANOON_API_TOKEN"]
-HUGGINGFACE_API_TOKEN = st.secrets["HUGGINGFACE_API_TOKEN"]
-API_URL = st.secrets["API_URL"]
-OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
-OPENAI_ENDPOINT = st.secrets["OPENAI_ENDPOINT"]
+INDIANKANOON_API_TOKEN = st.secrets["indiankanoon"]["INDIANKANOON_API_TOKEN"]
+HUGGINGFACE_API_TOKEN = st.secrets["huggingface"]["HUGGINGFACE_API_TOKEN"]
+API_URL = st.secrets["openai"]["API_URL"]
+OPENAI_API_KEY = st.secrets["openai"]["OPENAI_API_KEY"]
+OPENAI_ENDPOINT = st.secrets["openai"]["OPENAI_ENDPOINT"]
 
 
 OPENAI_HEADERS = {
