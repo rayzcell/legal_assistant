@@ -109,7 +109,7 @@ def query_ai_model(question, related_case_summaries):
 
     except Exception as e:
         # Handle exceptions and return error message
-        return f"Error while querying the AI: {str(e)}"
+        return f"Error while querying AI: {str(e)}"
 
 
 class IKApi:
