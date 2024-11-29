@@ -17,7 +17,7 @@ HUGGINGFACE_API_TOKEN = st.secrets["huggingface"]["HUGGINGFACE_API_TOKEN"]
 API_URL = st.secrets["openai"]["API_URL"]
 OPENAI_API_KEY = st.secrets["openai"]["OPENAI_API_KEY"]
 OPENAI_ENDPOINT = st.secrets["openai"]["OPENAI_ENDPOINT"]
-
+GROQ_API_KEY =  st.secrets["GROQ"]["GROQ_API"]
 
 OPENAI_HEADERS = {
     "Content-Type": "application/json",
@@ -25,7 +25,7 @@ OPENAI_HEADERS = {
 }
 
 
-def query_ai_model(question, related_case_summaries):
+'''def query_ai_model(question, related_case_summaries):
     payload = {
         "messages": [
             {
@@ -57,7 +57,60 @@ def query_ai_model(question, related_case_summaries):
     except requests.RequestException as e:
         #return f"Error while querying the AI: {str(e).split(':')[0:2]}{payload}"
         return f"Error while querying the AI: {str(e)}"
-    return answer
+    return answer'''
+
+
+from groq import Groq
+
+def query_ai_model(question, related_case_summaries):
+    # Instantiate Groq client
+    client = Groq(api_key = GROQ_API_KEY)
+
+    # Define the messages payload
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "You are an AI legal assistant. Analyze the provided case summaries, "
+                "extract relevant insights, and answer the user's query with a concise and detailed response. "
+                "Avoid repeating the query or unnecessary introductions; focus solely on actionable insights."
+            ),
+        },
+        {
+            "role": "user",
+            "content": (
+                f"Query: {question}\n\n"
+                "Related case summaries:\n\n"
+                + related_case_summaries[:100]  # Ensure the summaries are not too long
+            ),
+        },
+    ]
+
+    try:
+        # Create the completion request
+        completion = client.chat.completions.create(
+            model="llama3-8b-8192",
+            messages=messages,
+            temperature=0.7,
+            max_tokens=1000,
+            top_p=0.95,
+            stream=True,  # Enables streaming for incremental responses
+            stop=None,
+        )
+
+        # Collect and build the response from chunks
+        answer = ""
+        for chunk in completion:
+            delta = chunk.choices[0].delta.content or ""
+            answer += delta
+
+        # Return the final response
+        return answer.strip()
+
+    except Exception as e:
+        # Handle exceptions and return error message
+        return f"Error while querying the AI: {str(e)}"
+
 
 class IKApi:
     def __init__(self, maxpages=1):
