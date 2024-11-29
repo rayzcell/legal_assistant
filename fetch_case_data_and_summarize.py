@@ -17,8 +17,8 @@ HUGGINGFACE_API_TOKEN = st.secrets["huggingface"]["HUGGINGFACE_API_TOKEN"]
 API_URL = st.secrets["openai"]["API_URL"]
 OPENAI_API_KEY = st.secrets["openai"]["OPENAI_API_KEY"]
 OPENAI_ENDPOINT = st.secrets["openai"]["OPENAI_ENDPOINT"]
-GROQ_API_KEY =  st.secrets["GROQ"]["GROQ_API"]
-
+#GROQ_API_KEY =  st.secrets["GROQ"]["GROQ_API"]
+GROQ_API_KEY =  "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"
 OPENAI_HEADERS = {
     "Content-Type": "application/json",
     "api-key": OPENAI_API_KEY,
