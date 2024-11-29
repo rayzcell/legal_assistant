@@ -26,7 +26,6 @@ OPENAI_HEADERS = {
 
 
 def query_ai_model(question, related_case_summaries):
-    print(len(related_case_summaries.split()))
     payload = {
         "messages": [
             {
@@ -56,7 +55,7 @@ def query_ai_model(question, related_case_summaries):
         response.raise_for_status()
         answer = response.json().get("choices", [{}])[0].get("message", {}).get("content", "No answer found.")
     except requests.RequestException as e:
-        return f"Error while querying the AI: {str(e).split(':')[0:2]}{len(related_case_summaries.split())}"
+        return f"Error while querying the AI: {str(e).split(':')[0:2]}{payload}"
     return answer
 
 class IKApi:
