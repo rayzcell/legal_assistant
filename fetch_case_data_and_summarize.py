@@ -42,7 +42,7 @@ def query_ai_model(question, related_case_summaries):
                 "content": (
                     f"Query: {question}\n\n"
                     "Related case summaries:\n\n"
-                    + related_case_summaries[:200]
+                    + related_case_summaries[:100]
                 ),
             },
         ],
