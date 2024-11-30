@@ -67,25 +67,25 @@ def query_ai_model(question, related_case_summaries):
     client = Groq(api_key = GROQ_API_KEY)
 
     # Define the messages payload
-   messages = [
-    {
-        "role": "system",
-        "content": (
-            "You are a legal AI assistant specializing in analyzing legal case summaries. "
-            "Your task is to provide concise, actionable insights based solely on the information provided. "
-            "Focus on extracting key points, interpreting relevant legal principles, and addressing the user's query directly. "
-            "Avoid boilerplate language, unnecessary context, or speculation; prioritize clarity and precision."
-        ),
-    },
-    {
-        "role": "user",
-        "content": (
-            f"Query: {question}\n\n"
-            "Related case summaries:\n\n"
-            + related_case_summaries  # Ensure the summaries are not too long
-        ),
-    },
-]
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "You are a legal AI assistant specializing in analyzing legal case summaries. "
+                "Your task is to provide concise, actionable insights based solely on the information provided. "
+                "Focus on extracting key points, interpreting relevant legal principles, and addressing the user's query directly. "
+                "Avoid boilerplate language, unnecessary context, or speculation; prioritize clarity and precision."
+            ),
+        },
+        {
+            "role": "user",
+            "content": (
+                f"Query: {question}\n\n"
+                "Related case summaries:\n\n"
+                + related_case_summaries  # Ensure the summaries are not too long
+            ),
+        },
+    ]
 
 
     try:
