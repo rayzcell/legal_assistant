@@ -5,7 +5,8 @@ from fetch_case_data_and_summarize import IKApi, query_ai_model  # Replace with 
 users = {
     "admin": {"password": "admin123", "approved": True, "is_admin": True},  # Predefined admin credentials
 }
-pending_users = {}  # Store pending user registrations
+if "pending_users" not in st.session_state:
+    st.session_state.pending_users = {}  # Pending users for admin approval
 
 # Initialize IKApi (replace with your own implementation)
 ikapi = IKApi(maxpages=5)
@@ -21,13 +22,13 @@ if "authentication_status" not in st.session_state:
 def admin_panel():
     st.subheader("Admin Panel")
     if st.session_state.is_admin:
-        if pending_users:
+        if st.session_state.pending_users:
             st.info("Pending User Approvals:")
-            for user, details in list(pending_users.items()):
+            for user, details in list(st.session_state.pending_users.items()):
                 st.write(f"User: {user}")
-                if st.button(f"Approve {user}"):
+                if st.button(f"Approve {user}", key=f"approve_{user}"):
                     users[user] = {"password": details["password"], "approved": True, "is_admin": False}
-                    pending_users.pop(user)
+                    del st.session_state.pending_users[user]
                     st.success(f"Approved user: {user}")
         else:
             st.info("No users pending approval.")
@@ -91,12 +92,12 @@ def register_user():
     new_username = st.text_input("Choose a username")
     new_password = st.text_input("Choose a password", type="password")
     if st.button("Register"):
-        if new_username in users or new_username in pending_users:
+        if new_username in users or new_username in st.session_state.pending_users:
             st.error("Username already exists!")
         elif not new_username.strip() or not new_password.strip():
             st.warning("Username and password cannot be empty!")
         else:
-            pending_users[new_username] = {"password": new_password}
+            st.session_state.pending_users[new_username] = {"password": new_password}
             st.success("Registration successful! Wait for admin approval.")
 
 
