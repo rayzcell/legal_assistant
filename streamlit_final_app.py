@@ -1,6 +1,6 @@
 import streamlit as st
 import sqlite3
-from fetch_case_data_and_summarize import IKApi, query_ai_model  # Replace with your actual imports
+from fetch_case_data_and_summarize import IKApi, query_ai_model 
 
 # Initialize the IKApi (replace with your actual implementation)
 ikapi = IKApi(maxpages=5)
