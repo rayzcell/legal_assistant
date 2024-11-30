@@ -61,23 +61,29 @@ if not get_user("admin"):
     add_user("admin", "admin123", approved=True, is_admin=True)
 
 # Session management
+if "page" not in st.session_state:
+    st.session_state.page = "Login"
 if "authentication_status" not in st.session_state:
     st.session_state.authentication_status = False
     st.session_state.username = None
     st.session_state.is_admin = False
 
-# Sidebar menu
-def sidebar_menu():
-    st.sidebar.title("Navigation")
-    return st.sidebar.selectbox(
-        "Select an Option",
-        ["Login", "Register", "Admin Panel", "Main App", "Logout"],
-        index=0,
-    )
+# Navigation buttons
+st.sidebar.title("Navigation")
+if st.sidebar.button("Login"):
+    st.session_state.page = "Login"
+if st.sidebar.button("Register"):
+    st.session_state.page = "Register"
+if st.sidebar.button("Admin Panel"):
+    st.session_state.page = "Admin Panel"
+if st.sidebar.button("Main App"):
+    st.session_state.page = "Main App"
+if st.sidebar.button("Logout"):
+    st.session_state.page = "Logout"
 
 # Admin Panel for approving users
 def admin_panel():
-    st.header("Admin Panel")
+    st.subheader("Admin Panel")
     if st.session_state.is_admin:
         pending_users = get_pending_users()
         if pending_users:
@@ -91,7 +97,7 @@ def admin_panel():
         else:
             st.info("No users pending approval.")
     else:
-        st.error("Access denied. Only admins can access this page.")
+        st.error("Only admins can access this page.")
 
 # Main app content (query and insights)
 def main_app():
@@ -144,7 +150,7 @@ def main_app():
 
 # User registration
 def register_user():
-    st.header("Register")
+    st.subheader("Register")
     new_username = st.text_input("Choose a username")
     new_password = st.text_input("Choose a password", type="password")
     if st.button("Register"):
@@ -158,7 +164,7 @@ def register_user():
 
 # User login
 def login_user():
-    st.header("Login")
+    st.subheader("Login")
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
     if st.button("Login"):
@@ -185,35 +191,33 @@ def logout():
     st.session_state.is_admin = False
     st.success("You have been logged out.")
 
-# Main app logic
-menu = sidebar_menu()
-
-if menu == "Register":
-    if not st.session_state.authentication_status:
-        register_user()
-    else:
-        st.warning("You are already logged in!")
-
-elif menu == "Login":
+# Page logic
+if st.session_state.page == "Login":
     if not st.session_state.authentication_status:
         login_user()
     else:
         st.warning("You are already logged in!")
 
-elif menu == "Admin Panel":
+elif st.session_state.page == "Register":
+    if not st.session_state.authentication_status:
+        register_user()
+    else:
+        st.warning("You are already logged in!")
+
+elif st.session_state.page == "Admin Panel":
     if st.session_state.authentication_status and st.session_state.is_admin:
         admin_panel()
     else:
-        st.error("Access denied. Only admins can access this page.")
+        st.error("You must be an admin to access this page.")
 
-elif menu == "Main App":
+elif st.session_state.page == "Main App":
     if st.session_state.authentication_status:
         main_app()
     else:
-        st.error("Please log in to access the main app.")
+        st.error("You must log in to access this page.")
 
-elif menu == "Logout":
+elif st.session_state.page == "Logout":
     if st.session_state.authentication_status:
         logout()
     else:
-        st.warning("You are not logged in.")
+        st.warning("You are not logged in!")
