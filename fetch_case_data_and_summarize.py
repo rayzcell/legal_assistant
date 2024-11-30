@@ -81,7 +81,7 @@ def query_ai_model(question, related_case_summaries):
             "content": (
                 f"Query: {question}\n\n"
                 "Related case summaries:\n\n"
-                + related_case_summaries[:100]  # Ensure the summaries are not too long
+                + related_case_summaries  # Ensure the summaries are not too long
             ),
         },
     ]
