@@ -3,17 +3,19 @@ from fetch_case_data_and_summarize import IKApi, query_ai_model
 import streamlit_authenticator as stauth
 import json
 
-# Simulated storage for user credentials and admin approval
-# In production, replace this with a database
+passwords = ["admin123", "password123"]
+hashed_passwords = stauth.Hasher(passwords).hash()
+
+# Correct structure for credentials
 user_data = {
     "usernames": {
         "admin": {
             "name": "Admin User",
-            "password": stauth.Hasher(["admin123"]).generate()[0],  # Hashed password
+            "password": hashed_passwords[0],
         },
         "john_doe": {
-            "name": "ahil",
-            "password": stauth.Hasher(["password123"]).generate()[0],  # Hashed password
+            "name": "Ahil",
+            "password": hashed_passwords[1],
         },
     }
 }
