@@ -73,7 +73,7 @@ def query_ai_model(question, related_case_summaries):
             "content": (
                 "You are an AI legal assistant. Analyze the provided case summaries, "
                 "extract relevant insights, and answer the user's query with a concise and detailed response. "
-                "Avoid repeating the query or unnecessary introductions; focus solely on actionable insights."
+                "Avoid repeating the query, any biolerplate text or unnecessary introductions; focus solely on actionable insights and be to the point."
             ),
         },
         {
