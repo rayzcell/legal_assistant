@@ -1,19 +1,66 @@
 import streamlit as st
+import sqlite3
 from fetch_case_data_and_summarize import IKApi, query_ai_model  # Replace with your actual imports
 
-# In-memory user data
-if "users" not in st.session_state:
-    st.session_state.users = {
-        "admin": {"password": "admin123", "approved": True, "is_admin": True},  # Predefined admin credentials
-    }
-
-if "pending_users" not in st.session_state:
-    st.session_state.pending_users = {}  # Pending users for admin approval
-
-# Initialize IKApi (replace with your own implementation)
+# Initialize the IKApi (replace with your actual implementation)
 ikapi = IKApi(maxpages=5)
 
-# Initialize session state
+# Database setup
+def init_db():
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
+    c.execute(
+        """CREATE TABLE IF NOT EXISTS users (
+            username TEXT PRIMARY KEY,
+            password TEXT NOT NULL,
+            approved BOOLEAN NOT NULL,
+            is_admin BOOLEAN NOT NULL
+        )"""
+    )
+    conn.commit()
+    conn.close()
+
+def add_user(username, password, approved=False, is_admin=False):
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
+    c.execute(
+        "INSERT INTO users (username, password, approved, is_admin) VALUES (?, ?, ?, ?)",
+        (username, password, approved, is_admin),
+    )
+    conn.commit()
+    conn.close()
+
+def get_user(username):
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
+    c.execute("SELECT * FROM users WHERE username = ?", (username,))
+    user = c.fetchone()
+    conn.close()
+    return user
+
+def get_pending_users():
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
+    c.execute("SELECT username FROM users WHERE approved = 0 AND is_admin = 0")
+    pending_users = c.fetchall()
+    conn.close()
+    return pending_users
+
+def approve_user(username):
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
+    c.execute("UPDATE users SET approved = 1 WHERE username = ?", (username,))
+    conn.commit()
+    conn.close()
+
+# Initialize database
+init_db()
+
+# Add an admin user (run once)
+if not get_user("admin"):
+    add_user("admin", "admin123", approved=True, is_admin=True)
+
+# Session management
 if "authentication_status" not in st.session_state:
     st.session_state.authentication_status = False
     st.session_state.username = None
@@ -24,17 +71,14 @@ if "authentication_status" not in st.session_state:
 def admin_panel():
     st.subheader("Admin Panel")
     if st.session_state.is_admin:
-        if st.session_state.pending_users:
+        pending_users = get_pending_users()
+        if pending_users:
             st.info("Pending User Approvals:")
-            for user, details in list(st.session_state.pending_users.items()):
+            for user in pending_users:
+                user = user[0]
                 st.write(f"User: {user}")
                 if st.button(f"Approve {user}", key=f"approve_{user}"):
-                    st.session_state.users[user] = {
-                        "password": details["password"],
-                        "approved": True,
-                        "is_admin": False,
-                    }
-                    del st.session_state.pending_users[user]
+                    approve_user(user)
                     st.success(f"Approved user: {user}")
         else:
             st.info("No users pending approval.")
@@ -98,12 +142,12 @@ def register_user():
     new_username = st.text_input("Choose a username")
     new_password = st.text_input("Choose a password", type="password")
     if st.button("Register"):
-        if new_username in st.session_state.users or new_username in st.session_state.pending_users:
+        if get_user(new_username):
             st.error("Username already exists!")
         elif not new_username.strip() or not new_password.strip():
             st.warning("Username and password cannot be empty!")
         else:
-            st.session_state.pending_users[new_username] = {"password": new_password}
+            add_user(new_username, new_password)
             st.success("Registration successful! Wait for admin approval.")
 
 
@@ -113,13 +157,14 @@ def login_user():
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
     if st.button("Login"):
-        if username in st.session_state.users:
-            user_data = st.session_state.users[username]
-            if user_data["password"] == password:
-                if user_data["approved"]:
+        user = get_user(username)
+        if user:
+            stored_password, approved, is_admin = user[1], user[2], user[3]
+            if stored_password == password:
+                if approved:
                     st.session_state.authentication_status = True
                     st.session_state.username = username
-                    st.session_state.is_admin = user_data["is_admin"]
+                    st.session_state.is_admin = bool(is_admin)
                     st.success(f"Welcome, {username}!")
                 else:
                     st.error("Your account is not approved yet. Please wait for admin approval.")
