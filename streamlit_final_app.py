@@ -3,7 +3,6 @@ import sqlite3
 from fetch_case_data_and_summarize import IKApi, query_ai_model
 from streamlit_option_menu import option_menu
 
-# Initialize the IKApi (replace with your actual implementation)
 ikapi = IKApi(maxpages=5)
 
 # Database setup
@@ -57,7 +56,6 @@ def approve_user(username):
 # Initialize database
 init_db()
 
-# Add an admin user (run once)
 if not get_user("admin"):
     add_user("admin", "admin123", approved=True, is_admin=True)
 
@@ -72,11 +70,11 @@ if "authentication_status" not in st.session_state:
 # Option menu for navigation
 with st.sidebar:
     selected = option_menu(
-        menu_title="Main Menu",  # Main menu title
-        options=["Login", "Register", "Admin Panel", "Main App", "Logout"],  # Menu options
-        menu_icon="cast",  # Icon for the menu
-        default_index=0,  # Default option (Login)
-        orientation="vertical",  # Vertical orientation
+        menu_title="Main Menu",  
+        options=["Login", "Register", "Admin Panel", "Legal Query", "Logout"],  # Menu options
+        menu_icon="cast", 
+        default_index=0,  
+        orientation="vertical",  
     )
 
 # Admin Panel for approving users
@@ -99,8 +97,8 @@ def admin_panel():
 
 # Main app content (query and insights)
 def main_app():
-    st.title("Legal Case Analysis Assistant")
-    st.markdown("This app provides detailed insights from legal case summaries.")
+    st.title("AI Based Legal Research Assistant")
+    st.markdown("This app provides detailed insights from related legal cases from Indian Courts.")
 
     query = st.text_input("Enter your legal query (e.g., 'road accident cases'):")
     if st.button("Analyze"):
@@ -116,7 +114,7 @@ def main_app():
                 st.success(f"Found {len(doc_ids)} related documents. Processing summaries...")
 
                 all_summaries = []
-                for docid in doc_ids[:2]:  # Process only the first 2 case documents
+                for docid in doc_ids[:2]:  
                     case_details = ikapi.fetch_doc(docid)
 
                     if not case_details:
@@ -208,7 +206,7 @@ elif selected == "Admin Panel":
     else:
         st.error("You must be an admin to access this page.")
 
-elif selected == "Main App":
+elif selected == "Legal Query":
     if st.session_state.authentication_status:
         main_app()
     else:
