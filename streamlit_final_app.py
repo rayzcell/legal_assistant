@@ -48,5 +48,5 @@ if st.button("Analyze"):
 
             st.info("Generating insights from summaries...")
             insights = query_ai_model(query, combined_summary)
-            st.subheader("AI Insights")
+            st.subheader("AI Insights and Analysis")
             st.write(insights)
