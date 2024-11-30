@@ -12,7 +12,7 @@ ikapi = IKApi(maxpages=5)
 
 # Initialize session state
 if "authentication_status" not in st.session_state:
-    st.session_state.authentication_status = None
+    st.session_state.authentication_status = False
     st.session_state.username = None
     st.session_state.is_admin = False
 
@@ -118,20 +118,43 @@ def login_user():
             st.error("Invalid username or password.")
 
 
+# Logout function
+def logout():
+    st.session_state.authentication_status = False
+    st.session_state.username = None
+    st.session_state.is_admin = False
+    st.success("You have been logged out.")
+
+
 # Sidebar menu
-menu = st.sidebar.selectbox("Menu", ["Login", "Register", "Admin Panel", "Main App"])
+menu = st.sidebar.selectbox("Menu", ["Login", "Register", "Admin Panel", "Main App", "Logout"])
 
 if menu == "Register":
-    register_user()
+    if not st.session_state.authentication_status:
+        register_user()
+    else:
+        st.warning("You are already logged in!")
+
 elif menu == "Login":
-    login_user()
+    if not st.session_state.authentication_status:
+        login_user()
+    else:
+        st.warning("You are already logged in!")
+
 elif menu == "Admin Panel":
     if st.session_state.authentication_status and st.session_state.is_admin:
         admin_panel()
     else:
         st.error("You must be an admin to access this page.")
+
 elif menu == "Main App":
     if st.session_state.authentication_status:
         main_app()
     else:
         st.error("You must log in to access this page.")
+
+elif menu == "Logout":
+    if st.session_state.authentication_status:
+        logout()
+    else:
+        st.warning("You are not logged in!")
