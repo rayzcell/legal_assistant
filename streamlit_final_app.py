@@ -1,10 +1,12 @@
 import streamlit as st
-from fetch_case_data_and_summarize import IKApi, query_ai_model  # Replace with your actual import
+from fetch_case_data_and_summarize import IKApi, query_ai_model  # Replace with your actual imports
 
 # In-memory user data
-users = {
-    "admin": {"password": "admin123", "approved": True, "is_admin": True},  # Predefined admin credentials
-}
+if "users" not in st.session_state:
+    st.session_state.users = {
+        "admin": {"password": "admin123", "approved": True, "is_admin": True},  # Predefined admin credentials
+    }
+
 if "pending_users" not in st.session_state:
     st.session_state.pending_users = {}  # Pending users for admin approval
 
@@ -27,7 +29,11 @@ def admin_panel():
             for user, details in list(st.session_state.pending_users.items()):
                 st.write(f"User: {user}")
                 if st.button(f"Approve {user}", key=f"approve_{user}"):
-                    users[user] = {"password": details["password"], "approved": True, "is_admin": False}
+                    st.session_state.users[user] = {
+                        "password": details["password"],
+                        "approved": True,
+                        "is_admin": False,
+                    }
                     del st.session_state.pending_users[user]
                     st.success(f"Approved user: {user}")
         else:
@@ -92,7 +98,7 @@ def register_user():
     new_username = st.text_input("Choose a username")
     new_password = st.text_input("Choose a password", type="password")
     if st.button("Register"):
-        if new_username in users or new_username in st.session_state.pending_users:
+        if new_username in st.session_state.users or new_username in st.session_state.pending_users:
             st.error("Username already exists!")
         elif not new_username.strip() or not new_password.strip():
             st.warning("Username and password cannot be empty!")
@@ -107,14 +113,18 @@ def login_user():
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
     if st.button("Login"):
-        if username in users and users[username]["password"] == password:
-            if users[username]["approved"]:
-                st.session_state.authentication_status = True
-                st.session_state.username = username
-                st.session_state.is_admin = users[username]["is_admin"]
-                st.success(f"Welcome, {username}!")
+        if username in st.session_state.users:
+            user_data = st.session_state.users[username]
+            if user_data["password"] == password:
+                if user_data["approved"]:
+                    st.session_state.authentication_status = True
+                    st.session_state.username = username
+                    st.session_state.is_admin = user_data["is_admin"]
+                    st.success(f"Welcome, {username}!")
+                else:
+                    st.error("Your account is not approved yet. Please wait for admin approval.")
             else:
-                st.error("Your account is not approved yet. Please wait for admin approval.")
+                st.error("Invalid username or password.")
         else:
             st.error("Invalid username or password.")
 
