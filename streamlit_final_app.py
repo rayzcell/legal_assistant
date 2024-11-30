@@ -4,7 +4,7 @@ import streamlit_authenticator as stauth
 import json
 
 passwords = ["admin123", "password123"]
-hashed_passwords = stauth.Hasher().hash(passwords)
+hashed_passwords = stauth.Hasher(passwords).hash(passwords)
 
 # Correct structure for credentials
 user_data = {
