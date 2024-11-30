@@ -1,6 +1,7 @@
 import streamlit as st
 import sqlite3
-from fetch_case_data_and_summarize import IKApi, query_ai_model 
+from fetch_case_data_and_summarize import IKApi, query_ai_model
+from streamlit_option_menu import option_menu
 
 # Initialize the IKApi (replace with your actual implementation)
 ikapi = IKApi(maxpages=5)
@@ -68,18 +69,15 @@ if "authentication_status" not in st.session_state:
     st.session_state.username = None
     st.session_state.is_admin = False
 
-# Navigation buttons
-st.sidebar.title("Navigation")
-if st.sidebar.button("Login"):
-    st.session_state.page = "Login"
-if st.sidebar.button("Register"):
-    st.session_state.page = "Register"
-if st.sidebar.button("Admin Panel"):
-    st.session_state.page = "Admin Panel"
-if st.sidebar.button("Main App"):
-    st.session_state.page = "Main App"
-if st.sidebar.button("Logout"):
-    st.session_state.page = "Logout"
+# Option menu for navigation
+with st.sidebar:
+    selected = option_menu(
+        menu_title="Main Menu",  # Main menu title
+        options=["Login", "Register", "Admin Panel", "Main App", "Logout"],  # Menu options
+        menu_icon="cast",  # Icon for the menu
+        default_index=0,  # Default option (Login)
+        orientation="vertical",  # Vertical orientation
+    )
 
 # Admin Panel for approving users
 def admin_panel():
@@ -192,31 +190,31 @@ def logout():
     st.success("You have been logged out.")
 
 # Page logic
-if st.session_state.page == "Login":
+if selected == "Login":
     if not st.session_state.authentication_status:
         login_user()
     else:
         st.warning("You are already logged in!")
 
-elif st.session_state.page == "Register":
+elif selected == "Register":
     if not st.session_state.authentication_status:
         register_user()
     else:
         st.warning("You are already logged in!")
 
-elif st.session_state.page == "Admin Panel":
+elif selected == "Admin Panel":
     if st.session_state.authentication_status and st.session_state.is_admin:
         admin_panel()
     else:
         st.error("You must be an admin to access this page.")
 
-elif st.session_state.page == "Main App":
+elif selected == "Main App":
     if st.session_state.authentication_status:
         main_app()
     else:
         st.error("You must log in to access this page.")
 
-elif st.session_state.page == "Logout":
+elif selected == "Logout":
     if st.session_state.authentication_status:
         logout()
     else:
