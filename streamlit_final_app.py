@@ -6,8 +6,18 @@ import json
 # Simulated storage for user credentials and admin approval
 # In production, replace this with a database
 user_data = {
-    "admin": {"password": "admin123", "approved": True},  # Admin login
+    "usernames": {
+        "admin": {
+            "name": "Admin User",
+            "password": stauth.Hasher(["admin123"]).generate()[0],  # Hashed password
+        },
+        "john_doe": {
+            "name": "ahil",
+            "password": stauth.Hasher(["password123"]).generate()[0],  # Hashed password
+        },
+    }
 }
+
 pending_users = {}
 
 # Functions for user management
