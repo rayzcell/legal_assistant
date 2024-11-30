@@ -66,10 +66,18 @@ if "authentication_status" not in st.session_state:
     st.session_state.username = None
     st.session_state.is_admin = False
 
+# Sidebar menu
+def sidebar_menu():
+    st.sidebar.title("Navigation")
+    return st.sidebar.selectbox(
+        "Select an Option",
+        ["Login", "Register", "Admin Panel", "Main App", "Logout"],
+        index=0,
+    )
 
 # Admin Panel for approving users
 def admin_panel():
-    st.subheader("Admin Panel")
+    st.header("Admin Panel")
     if st.session_state.is_admin:
         pending_users = get_pending_users()
         if pending_users:
@@ -83,8 +91,7 @@ def admin_panel():
         else:
             st.info("No users pending approval.")
     else:
-        st.error("Only admins can access this page.")
-
+        st.error("Access denied. Only admins can access this page.")
 
 # Main app content (query and insights)
 def main_app():
@@ -135,10 +142,9 @@ def main_app():
                 st.subheader("AI Insights and Analysis")
                 st.write(insights)
 
-
 # User registration
 def register_user():
-    st.subheader("Register")
+    st.header("Register")
     new_username = st.text_input("Choose a username")
     new_password = st.text_input("Choose a password", type="password")
     if st.button("Register"):
@@ -150,10 +156,9 @@ def register_user():
             add_user(new_username, new_password)
             st.success("Registration successful! Wait for admin approval.")
 
-
 # User login
 def login_user():
-    st.subheader("Login")
+    st.header("Login")
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
     if st.button("Login"):
@@ -173,7 +178,6 @@ def login_user():
         else:
             st.error("Invalid username or password.")
 
-
 # Logout function
 def logout():
     st.session_state.authentication_status = False
@@ -181,9 +185,8 @@ def logout():
     st.session_state.is_admin = False
     st.success("You have been logged out.")
 
-
-# Sidebar menu
-menu = st.sidebar.selectbox("Menu", ["Login", "Register", "Admin Panel", "Main App", "Logout"])
+# Main app logic
+menu = sidebar_menu()
 
 if menu == "Register":
     if not st.session_state.authentication_status:
@@ -201,16 +204,16 @@ elif menu == "Admin Panel":
     if st.session_state.authentication_status and st.session_state.is_admin:
         admin_panel()
     else:
-        st.error("You must be an admin to access this page.")
+        st.error("Access denied. Only admins can access this page.")
 
 elif menu == "Main App":
     if st.session_state.authentication_status:
         main_app()
     else:
-        st.error("You must log in to access this page.")
+        st.error("Please log in to access the main app.")
 
 elif menu == "Logout":
     if st.session_state.authentication_status:
         logout()
     else:
-        st.warning("You are not logged in!")
+        st.warning("You are not logged in.")
